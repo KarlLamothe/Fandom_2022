@@ -16,7 +16,7 @@ colnames(Fandom.Data)
 
 # personal ggplot theme
 theme_me <- theme_bw() + 
-  theme(axis.title.  = element_text(size=12, family="sans", colour="black"),
+  theme(axis.title  = element_text(size=12, family="sans", colour="black"),
         axis.text.x  = element_text(size=11, family="sans", colour="black"),
         axis.text.y  = element_text(size=11, family="sans", colour="black"),
         legend.title = element_text(size=10, family="sans", colour="black"),
