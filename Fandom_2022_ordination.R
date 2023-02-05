@@ -16,11 +16,8 @@ colnames(Fandom.Data)
 
 # personal ggplot theme
 theme_me <- theme_bw() + 
-  theme(axis.title  = element_text(size=12, family="sans", colour="black"),
-        axis.text.x  = element_text(size=11, family="sans", colour="black"),
+  theme(axis.text.x  = element_text(size=11, family="sans", colour="black"),
         axis.text.y  = element_text(size=11, family="sans", colour="black"),
-        legend.title = element_text(size=10, family="sans", colour="black"),
-        legend.text. = element_text(size=10, family="sans", colour="black"),
         plot.title   = element_text(size=12, family="sans", colour="black" ),
         axis.ticks   = element_line(colour="black"))
 theme_set(theme_me)
@@ -32,13 +29,12 @@ theme_set(theme_me)
 MPO.drops<-c(Fandom.Data$Kyle_Klein,     Fandom.Data$Corey_Ellis,
              Fandom.Data$Niklas_Anttila, Fandom.Data$Chris_Clemons,
              Fandom.Data$Cale_Leiviska,  Fandom.Data$Albert_Tamm,
-             # note that you must change vainos name to include umlauts
              Fandom.Data$Vaino_Makela,   Fandom.Data$Bradley_Williams,
              Fandom.Data$Andrew_Fish)
 
 #Create data frame for plotting
 MPO.drops.df<-cbind.data.frame(MPO.drops, 
-                               Player = c(rep("Kyle Klein",        length(Fandom.Data[,1])),
+                               Player = c(rep("Kyle Klein",       length(Fandom.Data[,1])),
                                           rep("Corey Ellis",      length(Fandom.Data[,1])),
                                           rep("Niklas Anttila",   length(Fandom.Data[,1])),
                                           rep("Chris Clemons",    length(Fandom.Data[,1])),
@@ -48,7 +44,7 @@ MPO.drops.df<-cbind.data.frame(MPO.drops,
                                           rep("Bradley Williams", length(Fandom.Data[,1])),
                                           rep("Andrew Fish",      length(Fandom.Data[,1]))))
 
-MPO.drops.df<-as.data.frame(na.omit(MPO.drops.df)) 
+MPO.drops.df<-MPO.drops.df[complete.cases(MPO.drops.df),] 
 
 # Scores should be factors and ordered
 MPO.drops.df$MPO.drops<-factor(MPO.drops.df$MPO.drops, levels=c(1,2,3,4,5,6,7,8,9,10))
@@ -59,8 +55,7 @@ Fandom.drops.MPO<-ggplot(MPO.drops.df, aes(y=MPO.drops))+
   coord_flip()+
   xlim(0,350)+
   facet_wrap(~Player)+
-  labs(x="Count",y='Fandom score')+
-  theme_me
+  labs(x="Count",y='Fandom score')
 
 # export the figure
 #tiff("MPO.drops.tiff", height=6, width=6, res=800, units='in')
@@ -92,8 +87,7 @@ Fandom.drops.FPO<-ggplot(FPO.drops.df, aes(y=FPO.drops))+
   coord_flip()+
   xlim(0,450)+
   facet_wrap(~Player)+
-  labs(x="Count",y='Fandom score')+
-  theme_me
+  labs(x="Count",y='Fandom score')
 
 # export the figure
 #tiff("FPO.drops.tiff", height=4, width=6, res=800, units='in')
@@ -102,7 +96,7 @@ Fandom.drops.FPO
 
 #############################################################3
 # Make data frame of people
-People <- Fandom_copy[c(3:55)]
+People <- Fandom.Data[c(3:55)]
 
 # division specific
 MPO <- People[c(1:9, 20:41, 53)]
@@ -159,11 +153,12 @@ rownames(vscores)<-c("McMahon", "Wysocki", "Dickerson",
                      "Sexton", "Aderhold", "Smith", "Barsby",
                      "Koling", "Gilbert", "Harris")
 
+scaleFUN <- function(x) sprintf("%.2f", x)
 # Create plot of model
 MPO.PCA.gg <- ggplot(scores, aes(x = PC1, y = PC2)) +
   geom_hline(yintercept=0, linetype="dashed", col="black")+
   geom_vline(xintercept=0, linetype="dashed", col="black")+
-  annotate('text', label='MPO', x=-0.33, y = 0.45)+
+  #annotate('text', label='MPO', x=-0.33, y = 0.45)+
   geom_segment(data = vscores, 
                aes(x = 0, y = 0, xend = PC1, yend = PC2), 
                arrow=arrow(length = unit(0.2, "cm")), 
@@ -176,7 +171,9 @@ MPO.PCA.gg <- ggplot(scores, aes(x = PC1, y = PC2)) +
             size=3)+
   labs(x = "PCA Axis 1 (14.00%)", y = "PCA Axis 2 (9.90%)") + 
   coord_fixed(xlim=c(-0.4,0.5))+
-  theme_me
+  scale_y_continuous(labels=scaleFUN)+
+  labs(title='MPO')+
+  theme(panel.background = element_rect(fill = '#F0F9FF'))
 MPO.PCA.gg
 
 ##########################################
@@ -198,7 +195,6 @@ rownames(vscores2)<-c("Tattar","Pierce","C.Allen",
 PCA.FPO.gg <- ggplot(scores2, aes(x = PC1, y = PC2)) +
   geom_hline(yintercept=0, linetype="dashed", col="black")+
   geom_vline(xintercept=0, linetype="dashed", col="black")+
-  annotate('text',label='FPO', x=-0.54, y = 0.54)+
   geom_segment(data = vscores2, 
                aes(x = 0, y = 0, xend = PC1, yend = PC2), 
                arrow=arrow(length=unit(0.2,"cm")), 
@@ -211,9 +207,11 @@ PCA.FPO.gg <- ggplot(scores2, aes(x = PC1, y = PC2)) +
   labs(x = "PCA Axis 1 (18.37%)", y = "PCA Axis 2 (12.26%)") + 
   coord_fixed(xlim = c(-.62,0.45),
               ylim = c(-0.5,0.55))+
-  theme_me
+  scale_y_continuous(labels=scaleFUN)+
+  labs(title='FPO')+
+  theme(panel.background = element_rect(fill = '#FFF0F0'))
 PCA.FPO.gg
 
-#tiff('MPO_FPO_PCA.tiff',height=4, width=7, res=800, units='in')
+#tiff('MPO_FPO_PCA.tiff',height=4.5, width=7, res=800, units='in')
 MPO.PCA.gg + PCA.FPO.gg
 #dev.off()
